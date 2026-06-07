@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lamb Documentation</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <aside class="sidebar" aria-label="Documentation navigation">
+      <a class="brand" href="#overview">
+        <img src="assets/lamb.png" alt="Lamb logo" />
+        <span>
+          <strong>Lamb</strong>
+          <small>Language Docs</small>
+        </span>
+      </a>
+
+      <label class="search-label" for="docSearch">Search docs</label>
+      <input
+        id="docSearch"
+        class="search-input"
+        type="search"
+        placeholder="Try class, return, while"
+      />
+
+      <nav class="nav-list" aria-label="Sections">
+        <a href="#overview">Overview</a>
+        <a href="#quick-start">Quick Start</a>
+        <a href="#commands">Commands</a>
+        <a href="#syntax">Syntax</a>
+        <a href="#expressions">Expressions</a>
+        <a href="#control-flow">Control Flow</a>
+        <a href="#functions">Functions</a>
+        <a href="#classes">Classes</a>
+        <a href="#native">Native API</a>
+        <a href="#errors">Errors</a>
+      </nav>
+    </aside>
+
+    <main id="main" class="content">
+      <section
+        id="overview"
+        class="hero doc-section"
+        data-search="overview pipeline interpreter java scanner parser resolver runtime"
+      >
+        <div class="hero-copy">
+          <p class="eyebrow">Interpreter Handbook</p>
+          <div class="hero-badges" aria-label="Highlights">
+            <span>Java interpreter</span>
+            <span>Runnable examples</span>
+            <span>Feature-by-feature guide</span>
+          </div>
+          <h1>
+            Learn Lamb syntax, commands, and runtime behavior in one place.
+          </h1>
+          <p class="lead">
+            Lamb is a small scripting language implemented in Java. This guide
+            is built for readers who want to run programs, understand the
+            syntax, and extend the interpreter without guessing where each
+            feature lives.
+          </p>
+          <div class="hero-actions">
+            <a class="primary-action" href="#quick-start">Start running Lamb</a>
+            <a class="secondary-action" href="#commands"
+              >View command reference</a
+            >
+          </div>
+        </div>
+
+        <div class="hero-panel" aria-label="Lamb pipeline">
+          <img src="assets/lamb.png" alt="Lamb logo" />
+          <div class="pipeline">
+            <span>Source</span>
+            <span>Tokens</span>
+            <span>AST</span>
+            <span>Resolve</span>
+            <span>Run</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="stat-grid" aria-label="Project highlights">
+        <article>
+          <strong>16</strong>
+          <span>language keywords</span>
+        </article>
+        <article>
+          <strong>4</strong>
+          <span>core passes</span>
+        </article>
+        <article>
+          <strong>1</strong>
+          <span>native function</span>
+        </article>
+        <article>
+          <strong>0</strong>
+          <span>build tools required</span>
+        </article>
+      </section>
+
+      <p id="emptyState" class="empty-state" hidden>
+        No matching sections. Try a keyword such as class, print, function, or
+        resolver.
+      </p>
+
+      <section
+        id="quick-start"
+        class="doc-section"
+        data-search="quick start compile run repl javac java command windows linux mac ast generator"
+      >
+        <div class="section-heading">
+          <p class="eyebrow">Quick Start</p>
+          <h2>Run Lamb from a terminal</h2>
+          <p>
+            Lamb only needs a JDK. No Gradle, Maven, or package manager is
+            required.
+          </p>
+        </div>
+
+        <div class="tabs" data-tabs>
+          <div class="tab-list" role="tablist" aria-label="Compile commands">
+            <button
+              class="tab-button is-active"
+              type="button"
+              role="tab"
+              aria-selected="true"
+              data-tab="windows"
+            >
+              Windows
+            </button>
+            <button
+              class="tab-button"
+              type="button"
+              role="tab"
+              aria-selected="false"
+              data-tab="unix"
+            >
+              macOS / Linux
+            </button>
+          </div>
+
+          <div class="tab-panel is-active" data-panel="windows">
+            <pre><code class="language-powershell">$build = "out"
+New-Item -ItemType Directory -Force -Path $build | Out-Null
+javac -d $build (Get-ChildItem -Recurse -Filter *.java | Select-Object -ExpandProperty FullName)</code></pre>
+          </div>
+
+          <div class="tab-panel" data-panel="unix" hidden>
+            <pre><code class="language-bash">mkdir -p out
+javac -d out $(find src -name "*.java")</code></pre>
+          </div>
+        </div>
+
+        <div class="command-grid">
+          <article>
+            <h3>Start the REPL</h3>
+            <pre><code class="language-bash">java -cp out com.lambinterpreter.lamb.Lamb</code></pre>
+          </article>
+          <article>
+            <h3>Run a file</h3>
+            <pre><code class="language-bash">java -cp out com.lambinterpreter.lamb.Lamb path/to/program.lamb</code></pre>
+          </article>
+          <article>
+            <h3>Regenerate AST sources</h3>
+            <pre><code class="language-bash">java -cp out com.lambinterpreter.tool.GenerateAst src/com/lambinterpreter/lamb</code></pre>
+          </article>
+        </div>
+      </section>
+
+      <section
+        id="commands"
+        class="doc-section"
+        data-search="commands keywords class fun for if while print return var super this nil true false and or else"
+      >
+        <div class="section-heading">
+          <p class="eyebrow">Command Reference</p>
+          <h2>Every keyword and command</h2>
+          <p>
+            These are the reserved words currently recognized by the scanner.
+          </p>
+        </div>
+
+        <div class="reference-table">
+          <div class="reference-row reference-head">
+            <span>Keyword</span>
+            <span>Syntax</span>
+            <span>Use</span>
+          </div>
+          <div class="reference-row">
+            <code>class</code><span><code>class Name { methods }</code></span
+            ><span>Declare a class.</span>
+          </div>
+          <div class="reference-row">
+            <code>&lt;</code
+            ><span><code>class Child &lt; Parent { }</code></span
+            ><span>Declare inheritance.</span>
+          </div>
+          <div class="reference-row">
+            <code>fun</code><span><code>fun name(params) { body }</code></span
+            ><span>Declare a function.</span>
+          </div>
+          <div class="reference-row">
+            <code>var</code><span><code>var name = value;</code></span
+            ><span>Declare a variable.</span>
+          </div>
+          <div class="reference-row">
+            <code>if</code><span><code>if (condition) statement</code></span
+            ><span>Run a branch when truthy.</span>
+          </div>
+          <div class="reference-row">
+            <code>else</code><span><code>else statement</code></span
+            ><span>Run the fallback branch.</span>
+          </div>
+          <div class="reference-row">
+            <code>while</code
+            ><span><code>while (condition) statement</code></span
+            ><span>Repeat while truthy.</span>
+          </div>
+          <div class="reference-row">
+            <code>for</code
+            ><span><code>for (init; condition; step) statement</code></span
+            ><span>Loop syntax lowered to <code>while</code>.</span>
+          </div>
+          <div class="reference-row">
+            <code>print</code><span><code>print expression;</code></span
+            ><span>Write a value to stdout.</span>
+          </div>
+          <div class="reference-row">
+            <code>return</code><span><code>return value;</code></span
+            ><span>Return from a function.</span>
+          </div>
+          <div class="reference-row">
+            <code>this</code><span><code>this.field</code></span
+            ><span>Access the current instance.</span>
+          </div>
+          <div class="reference-row">
+            <code>super</code><span><code>super.method()</code></span
+            ><span>Call a superclass method.</span>
+          </div>
+          <div class="reference-row">
+            <code>true</code><span><code>true</code></span
+            ><span>Boolean literal.</span>
+          </div>
+          <div class="reference-row">
+            <code>false</code><span><code>false</code></span
+            ><span>Boolean literal.</span>
+          </div>
+          <div class="reference-row">
+            <code>nil</code><span><code>nil</code></span
+            ><span>Empty value.</span>
+          </div>
+          <div class="reference-row">
+            <code>and</code><span><code>a and b</code></span
+            ><span>Parsed logical operator. Runtime path needs hardening.</span>
+          </div>
+          <div class="reference-row">
+            <code>or</code><span><code>a or b</code></span
+            ><span>Parsed logical operator. Runtime path needs hardening.</span>
+          </div>
+        </div>
+      </section>
+
+      <section
+        id="syntax"
+        class="doc-section"
+        data-search="syntax values comments semicolon string number boolean nil variable assignment scope block"
+      >
+        <div class="section-heading">
+          <p class="eyebrow">Syntax Basics</p>
+          <h2>Values, comments, variables, and scopes</h2>
+        </div>
+
+        <div class="lesson-grid">
+          <article>
+            <h3>Values</h3>
+            <pre><code class="language-lamb">print nil;
+print true;
+print 42;
+print "hello Lamb";</code></pre>
+          </article>
+          <article>
+            <h3>Comments</h3>
+            <pre><code class="language-lamb">// This line is ignored.
+print "comments use double slash";</code></pre>
+          </article>
+          <article>
+            <h3>Variables</h3>
+            <pre><code class="language-lamb">var name = "Ada";
+name = "Grace";
+print name;</code></pre>
+          </article>
+          <article>
+            <h3>Block scope</h3>
+            <pre><code class="language-lamb">var value = "global";
+{
+    var value = "local";
+    print value;
+}
+print value;</code></pre>
+          </article>
+        </div>
+      </section>
+
+      <section
+        id="expressions"
+        class="doc-section"
+        data-search="expressions operators arithmetic comparison equality unary call property field precedence string concat"
+      >
+        <div class="section-heading">
+          <p class="eyebrow">Expressions</p>
+          <h2>Operators and evaluation</h2>
+        </div>
+
+        <div class="reference-table compact">
+          <div class="reference-row reference-head">
+            <span>Operator</span>
+            <span>Meaning</span>
+            <span>Example</span>
+          </div>
+          <div class="reference-row">
+            <code>+</code><span>Add or concatenate.</span
+            ><span><code>1 + 2</code>, <code>"a" + "b"</code></span>
+          </div>
+          <div class="reference-row">
+            <code>- * /</code><span>Numeric operations.</span
+            ><span><code>10 - 3 * 2</code></span>
+          </div>
+          <div class="reference-row">
+            <code>&gt; &gt;= &lt; &lt;=</code><span>Numeric comparison.</span
+            ><span><code>age &gt;= 18</code></span>
+          </div>
+          <div class="reference-row">
+            <code>== !=</code><span>Equality checks.</span
+            ><span><code>name != "nil"</code></span>
+          </div>
+          <div class="reference-row">
+            <code>!</code><span>Truthiness negation.</span
+            ><span><code>!false</code></span>
+          </div>
+          <div class="reference-row">
+            <code>()</code><span>Call function or class.</span
+            ><span><code>clock()</code></span>
+          </div>
+          <div class="reference-row">
+            <code>.</code><span>Read or write object property.</span
+            ><span><code>user.name</code></span>
+          </div>
+        </div>
+      </section>
+
+      <section
+        id="control-flow"
+        class="doc-section"
+        data-search="control flow if else while for loop print branch condition"
+      >
+        <div class="section-heading">
+          <p class="eyebrow">Control Flow</p>
+          <h2>Branch and loop through code</h2>
+        </div>
+
+        <div class="lesson-grid">
+          <article>
+            <h3>If and else</h3>
+            <pre><code class="language-lamb">var score = 90;
+
+if (score >= 50) {
+    print "pass";
+} else {
+    print "try again";
+}</code></pre>
+          </article>
+          <article>
+            <h3>While</h3>
+            <pre><code class="language-lamb">var n = 3;
+
+while (n > 0) {
+    print n;
+    n = n - 1;
+}</code></pre>
+          </article>
+          <article>
+            <h3>For</h3>
+            <pre><code class="language-lamb">for (var i = 0; i < 3; i = i + 1) {
+    print i;
+}</code></pre>
+          </article>
+        </div>
+      </section>
+
+      <section
+        id="functions"
+        class="doc-section"
+        data-search="functions fun return closure callable arity parameters arguments recursion clock"
+      >
+        <div class="section-heading">
+          <p class="eyebrow">Functions</p>
+          <h2>First-class functions and closures</h2>
+        </div>
+
+        <pre><code class="language-lamb">fun makeCounter() {
+    var count = 0;
+
+    fun next() {
+        count = count + 1;
+        return count;
+    }
+
+    return next;
+}
+
+var counter = makeCounter();
+print counter();
+print counter();</code></pre>
+
+        <p class="note">
+          Function calls check argument count before execution. Parameter and
+          argument lists are capped at 255 entries.
+        </p>
+      </section>
+
+      <section
+        id="classes"
+        class="doc-section"
+        data-search="classes class init constructor instance field method inheritance this super object"
+      >
+        <div class="section-heading">
+          <p class="eyebrow">Classes</p>
+          <h2>Objects, methods, fields, and inheritance</h2>
+        </div>
+
+        <pre><code class="language-lamb">class Person {
+    init(name) {
+        this.name = name;
+    }
+
+    introduce() {
+        print "hello " + this.name;
+    }
+}
+
+class Developer < Person {
+    introduce() {
+        super.introduce();
+        print this.name + " writes Lamb";
+    }
+}
+
+var dev = Developer("Ada");
+dev.introduce();</code></pre>
+
+        <div class="callout">
+          <strong>Class rules:</strong>
+          <span
+            ><code>init</code> initializes a new instance, methods bind
+            <code>this</code>, and subclasses can reach overridden behavior with
+            <code>super.method()</code>.</span
+          >
+        </div>
+      </section>
+
+      <section
+        id="native"
+        class="doc-section"
+        data-search="native api clock standard library global function time benchmark"
+      >
+        <div class="section-heading">
+          <p class="eyebrow">Native API</p>
+          <h2>Built-in runtime functions</h2>
+        </div>
+
+        <div class="reference-table compact">
+          <div class="reference-row reference-head">
+            <span>Name</span>
+            <span>Arity</span>
+            <span>Behavior</span>
+          </div>
+          <div class="reference-row">
+            <code>clock</code><span><code>0</code></span
+            ><span>Returns current time in seconds as a number.</span>
+          </div>
+        </div>
+
+        <pre><code class="language-lamb">var start = clock();
+print start;</code></pre>
+      </section>
+
+      <section
+        id="errors"
+        class="doc-section"
+        data-search="errors diagnostics scanner parser resolver runtime exit code"
+      >
+        <div class="section-heading">
+          <p class="eyebrow">Diagnostics</p>
+          <h2>How Lamb reports problems</h2>
+        </div>
+
+        <div class="reference-table">
+          <div class="reference-row reference-head">
+            <span>Layer</span>
+            <span>Examples</span>
+            <span>Behavior</span>
+          </div>
+          <div class="reference-row">
+            <code>Scanner</code
+            ><span>Unexpected character, unterminated string.</span
+            ><span>Reports source line.</span>
+          </div>
+          <div class="reference-row">
+            <code>Parser</code
+            ><span>Missing semicolon, malformed declaration.</span
+            ><span>Synchronizes and continues parsing.</span>
+          </div>
+          <div class="reference-row">
+            <code>Resolver</code
+            ><span
+              >Bad <code>return</code>, invalid <code>this</code> or
+              <code>super</code>.</span
+            ><span>Reports before execution.</span>
+          </div>
+          <div class="reference-row">
+            <code>Runtime</code
+            ><span
+              >Undefined variable, invalid operands, non-callable call.</span
+            ><span>Stops with source line.</span>
+          </div>
+        </div>
+
+        <div class="exit-codes">
+          <span><strong>64</strong> invalid CLI usage</span>
+          <span><strong>65</strong> scan, parse, or resolve error</span>
+          <span><strong>70</strong> runtime error</span>
+        </div>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
