@@ -3,7 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Official documentation for the Lamb scripting language — syntax, commands, classes, native API, and runtime behavior in one place." />
     <title>Lamb Documentation</title>
+    <link rel="icon" type="image/png" href="assets/lamb.png" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -33,6 +35,7 @@
         <a href="#syntax">Syntax</a>
         <a href="#expressions">Expressions</a>
         <a href="#control-flow">Control Flow</a>
+        <a href="#loop-control">Loop Control</a>
         <a href="#functions">Functions</a>
         <a href="#classes">Classes</a>
         <a href="#native">Native API</a>
@@ -84,7 +87,7 @@
 
       <section class="stat-grid" aria-label="Project highlights">
         <article>
-          <strong>16</strong>
+          <strong>18</strong>
           <span>language keywords</span>
         </article>
         <article>
@@ -92,8 +95,8 @@
           <span>core passes</span>
         </article>
         <article>
-          <strong>1</strong>
-          <span>native function</span>
+          <strong>5</strong>
+          <span>native globals</span>
         </article>
         <article>
           <strong>0</strong>
@@ -254,11 +257,19 @@ javac -d out $(find src -name "*.java")</code></pre>
           </div>
           <div class="reference-row">
             <code>and</code><span><code>a and b</code></span
-            ><span>Parsed logical operator. Runtime path needs hardening.</span>
+            ><span>Logical AND with short-circuit evaluation.</span>
           </div>
           <div class="reference-row">
             <code>or</code><span><code>a or b</code></span
-            ><span>Parsed logical operator. Runtime path needs hardening.</span>
+            ><span>Logical OR with short-circuit evaluation.</span>
+          </div>
+          <div class="reference-row">
+            <code>break</code><span><code>break;</code></span
+            ><span>Exit the innermost loop immediately.</span>
+          </div>
+          <div class="reference-row">
+            <code>continue</code><span><code>continue;</code></span
+            ><span>Skip to the next loop iteration.</span>
           </div>
         </div>
       </section>
@@ -266,7 +277,7 @@ javac -d out $(find src -name "*.java")</code></pre>
       <section
         id="syntax"
         class="doc-section"
-        data-search="syntax values comments semicolon string number boolean nil variable assignment scope block"
+        data-search="syntax values comments semicolon string number boolean nil variable assignment scope block tilde block comment"
       >
         <div class="section-heading">
           <p class="eyebrow">Syntax Basics</p>
@@ -282,9 +293,16 @@ print 42;
 print "hello Lamb";</code></pre>
           </article>
           <article>
-            <h3>Comments</h3>
-            <pre><code class="language-lamb">// This line is ignored.
-print "comments use double slash";</code></pre>
+            <h3>Line comments</h3>
+            <pre><code class="language-lamb">// C-style line comment
+~~ Lamb-style line comment
+print "both styles are ignored";</code></pre>
+          </article>
+          <article>
+            <h3>Block comments</h3>
+            <pre><code class="language-lamb">~* This is a block comment.
+   It can span multiple lines. *~
+print "block comments use ~* and *~";</code></pre>
           </article>
           <article>
             <h3>Variables</h3>
@@ -300,6 +318,11 @@ print name;</code></pre>
     print value;
 }
 print value;</code></pre>
+          </article>
+          <article>
+            <h3>String + number coercion</h3>
+            <pre><code class="language-lamb">print "age: " + 25;
+print 100 + " points";</code></pre>
           </article>
         </div>
       </section>
@@ -354,7 +377,7 @@ print value;</code></pre>
       <section
         id="control-flow"
         class="doc-section"
-        data-search="control flow if else while for loop print branch condition"
+        data-search="control flow if else while for loop print branch condition and or logical"
       >
         <div class="section-heading">
           <p class="eyebrow">Control Flow</p>
@@ -386,6 +409,52 @@ while (n > 0) {
             <pre><code class="language-lamb">for (var i = 0; i < 3; i = i + 1) {
     print i;
 }</code></pre>
+          </article>
+          <article>
+            <h3>Logical operators</h3>
+            <pre><code class="language-lamb">if (true and false) {
+    print "won't run";
+}
+
+if (nil or "fallback") {
+    print "fallback wins";
+}</code></pre>
+          </article>
+        </div>
+      </section>
+
+      <section
+        id="loop-control"
+        class="doc-section"
+        data-search="loop control break continue skip exit iteration"
+      >
+        <div class="section-heading">
+          <p class="eyebrow">Loop Control</p>
+          <h2>Break and continue</h2>
+          <p>
+            Use <code>break</code> to exit a loop early, and
+            <code>continue</code> to skip to the next iteration. Both are
+            validated by the resolver — using them outside a loop is a
+            compile-time error.
+          </p>
+        </div>
+
+        <div class="lesson-grid">
+          <article>
+            <h3>Break</h3>
+            <pre><code class="language-lamb">for (var i = 0; i < 10; i = i + 1) {
+    if (i == 5) break;
+    print i;
+}
+// Prints 0 through 4</code></pre>
+          </article>
+          <article>
+            <h3>Continue</h3>
+            <pre><code class="language-lamb">for (var i = 0; i < 6; i = i + 1) {
+    if (i == 3) continue;
+    print i;
+}
+// Prints 0, 1, 2, 4, 5</code></pre>
           </article>
         </div>
       </section>
@@ -464,11 +533,11 @@ dev.introduce();</code></pre>
       <section
         id="native"
         class="doc-section"
-        data-search="native api clock standard library global function time benchmark"
+        data-search="native api clock input countSheep standard library global function time benchmark prompt stdin sheep constant version shepherd"
       >
         <div class="section-heading">
           <p class="eyebrow">Native API</p>
-          <h2>Built-in runtime functions</h2>
+          <h2>Built-in functions and constants</h2>
         </div>
 
         <div class="reference-table compact">
@@ -478,13 +547,58 @@ dev.introduce();</code></pre>
             <span>Behavior</span>
           </div>
           <div class="reference-row">
-            <code>clock</code><span><code>0</code></span
-            ><span>Returns current time in seconds as a number.</span>
+            <code>clock()</code><span><code>0</code></span
+            ><span>Returns current time in seconds since the Unix epoch.</span>
+          </div>
+          <div class="reference-row">
+            <code>input()</code><span><code>0 or 1</code></span
+            ><span>Reads a line from stdin. An optional argument prints a prompt first.</span>
+          </div>
+          <div class="reference-row">
+            <code>countSheep()</code><span><code>1</code></span
+            ><span>Prints <code>🐑 n sheep</code> lines with a one-second delay per sheep.</span>
           </div>
         </div>
 
-        <pre><code class="language-lamb">var start = clock();
+        <div class="lesson-grid">
+          <article>
+            <h3>clock()</h3>
+            <pre><code class="language-lamb">var start = clock();
 print start;</code></pre>
+          </article>
+          <article>
+            <h3>input()</h3>
+            <pre><code class="language-lamb">var name = input("What is your name? ");
+print "Hello, " + name + "!";</code></pre>
+          </article>
+        </div>
+
+        <div class="section-heading" style="margin-top: 24px;">
+          <h3>Built-in constants</h3>
+        </div>
+
+        <div class="reference-table compact">
+          <div class="reference-row reference-head">
+            <span>Name</span>
+            <span>Type</span>
+            <span>Value</span>
+          </div>
+          <div class="reference-row">
+            <code>__LAMB__</code><span>String</span
+            ><span><code>"Lamb v0.1"</code></span>
+          </div>
+          <div class="reference-row">
+            <code>__SHEPHERD__</code><span>String</span
+            ><span>Author credit (Deebyanshu Jha)</span>
+          </div>
+        </div>
+
+        <div class="callout">
+          <strong>Reserved names:</strong>
+          <span>The resolver prevents user code from declaring variables or functions named
+            <code>clock</code>, <code>input</code>, <code>countSheep</code>,
+            <code>__LAMB__</code>, or <code>__SHEPHERD__</code>.</span>
+        </div>
       </section>
 
       <section
